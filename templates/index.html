@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local LLM chat</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body data-base="{{ request.script_root }}">
+  <main>
+    <h1>Local LLM chat</h1>
+    <p class="subtitle">Model: {{ model }}, running on this server</p>
+
+    <div id="messages" aria-live="polite"></div>
+
+    <form id="chat-form">
+      <input id="message-input" type="text" maxlength="2000"
+             placeholder="Type a message..." autocomplete="off" required>
+      <button id="send-button" type="submit">Send</button>
+    </form>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
