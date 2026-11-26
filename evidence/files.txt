@@ -1,0 +1,22 @@
+ubuntu@myinstance:~$ ls -l /opt/chatapp/app /etc/chatapp/chatapp.env /run/chatapp/
+-rw-r----- 1 root    chatapp  264 Nov 25 19:40 /etc/chatapp/chatapp.env
+
+/opt/chatapp/app:
+total 60
+-rw-r--r-- 1 ubuntu ubuntu 4162 Nov 26 08:46 README.md
+-rw-rw-r-- 1 ubuntu ubuntu   41 Nov 26 08:46 REVISION
+-rw-r--r-- 1 ubuntu ubuntu 4482 Nov 26 08:46 app.py
+-rw-r--r-- 1 ubuntu ubuntu 1918 Nov 26 08:46 db.py
+drwxr-xr-x 5 ubuntu ubuntu 4096 Nov 26 08:46 deploy
+-rw-r--r-- 1 ubuntu ubuntu  149 Nov 26 08:46 pyproject.toml
+-rw-r--r-- 1 ubuntu ubuntu   39 Nov 26 08:46 requirements-dev.txt
+-rw-r--r-- 1 ubuntu ubuntu   60 Nov 26 08:46 requirements.txt
+drwxr-xr-x 2 ubuntu ubuntu 4096 Nov 26 08:46 scripts
+drwxr-xr-x 2 ubuntu ubuntu 4096 Nov 26 08:46 static
+drwxr-xr-x 2 ubuntu ubuntu 4096 Nov 26 08:46 templates
+-rw-r--r-- 1 ubuntu ubuntu 4979 Nov 26 08:46 test_app.py
+
+/run/chatapp/:
+total 0
+srwxrwx--- 1 chatapp chatapp 0 Nov 26 08:46 gunicorn.sock
+ubuntu@myinstance:~$

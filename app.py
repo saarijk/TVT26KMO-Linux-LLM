@@ -20,6 +20,7 @@ SYSTEM_PROMPT = os.environ.get(
 HISTORY_LIMIT = int(os.environ.get("HISTORY_LIMIT", "10"))
 MAX_MESSAGE_LEN = 2000
 SESSION_RE = re.compile(r"^[A-Za-z0-9-]{8,64}$")
+EVIDENCE_DIR = Path(__file__).with_name("evidence")
 
 app = Flask(__name__)
 
@@ -46,6 +47,17 @@ def health():
         return revision_file.read_text(encoding="utf-8")
     return "local\n"
 
+def _evidence() -> dict[str, str]:
+    items = {}
+    if EVIDENCE_DIR.is_dir():
+        for f in sorted(EVIDENCE_DIR.glob("*.txt")):
+            items[f.stem] = f.read_text(encoding="utf-8").rstrip()
+    return items
+
+
+@app.get("/docs")
+def docs():
+    return render_template("docs.html", ev=_evidence(), model=OLLAMA_MODEL)
 
 @app.get("/api/history/<session_id>")
 def history(session_id: str):

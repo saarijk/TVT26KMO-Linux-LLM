@@ -1,0 +1,16 @@
+ubuntu@myinstance:~$ systemctl is-enabled week2 chatapp ollama mariadb nginx
+enabled
+enabled
+enabled
+enabled
+enabled
+ubuntu@myinstance:~$ systemctl status week2 chatapp ollama nginx mariadb --no-pager | grep Active
+     Active: active (running) since Thu 2026-11-26 09:18:36 UTC; 48s ago
+     Active: active (running) since Thu 2026-11-26 09:18:36 UTC; 48s ago
+     Active: active (running) since Thu 2026-11-26 09:18:28 UTC; 56s ago
+     Active: active (running) since Thu 2026-11-26 09:18:31 UTC; 53s ago
+     Active: active (running) since Thu 2026-11-26 09:18:36 UTC; 48s ago
+ubuntu@myinstance:~$ swapon --show
+NAME      TYPE SIZE USED PRIO
+/swapfile file   2G   0B   -2
+ubuntu@myinstance:~$

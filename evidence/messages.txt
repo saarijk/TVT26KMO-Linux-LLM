@@ -1,0 +1,9 @@
+ubuntu@myinstance:~$ sudo mysql chatapp -e "SELECT LEFT(session_id,8) AS session, COUNT(*) AS messages FROM messages GROUP BY session_id;"
++----------+----------+
+| session  | messages |
++----------+----------+
+| 45036968 |        2 |
+| 8f43efbf |        3 |
+| e36384da |       28 |
++----------+----------+
+ubuntu@myinstance:~$

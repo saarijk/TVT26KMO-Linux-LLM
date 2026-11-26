@@ -1,0 +1,44 @@
+DEPLOYMENTS:
+
+feat: add LLM chat app, tests, deploy scripts and CI/CD workflow
+completed successfully:
+CI/CD #1: Commit b878dc1 pushed by saarijk
+
+feat: add README
+completed successfully:
+CI/CD #2: Commit ed5cc94 pushed by saarijk
+
+PS C:\workspace\TVT26KMO-Linux-LLM> curl.exe -s http://195.148.31.130/viikko5/health
+ed5cc94e577704b2c4eda3b8daaa6b54546477d4
+
+feat: break health test to demo pipeline
+failed:
+CI/CD #3: Commit cf1f352 pushed by saarijk
+
+PS C:\workspace\TVT26KMO-Linux-LLM> curl.exe -s http://195.148.31.130/viikko5/health
+ed5cc94e577704b2c4eda3b8daaa6b54546477d4
+PS C:\workspace\TVT26KMO-Linux-LLM> 
+
+Revert "feat: break health test to demo pipeline"
+completed successfully:
+CI/CD #4: Commit 315b213 pushed by saarijk
+
+PS C:\workspace\TVT26KMO-Linux-LLM> curl.exe -s http://195.148.31.130/viikko5/health
+315b213f6006db65c278a10a8d820793d53eee4c
+PS C:\workspace\TVT26KMO-Linux-LLM> 
+
+feat: break test again
+failed:
+CI/CD #5: Commit d550fc4 pushed by saarijk
+
+PS C:\workspace\TVT26KMO-Linux-LLM> curl.exe -s http://195.148.31.130/viikko5/health
+315b213f6006db65c278a10a8d820793d53eee4c
+PS C:\workspace\TVT26KMO-Linux-LLM> 
+
+Revert "feat: break test again"
+completed successfully:
+CI/CD #6: Commit f1b94dd pushed by saarijk
+
+PS C:\workspace\TVT26KMO-Linux-LLM> curl.exe -s http://195.148.31.130/viikko5/health
+f1b94dda2553cbf3a552c5ce2642f21e7aa67bcb
+PS C:\workspace\TVT26KMO-Linux-LLM> 

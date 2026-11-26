@@ -1,0 +1,33 @@
+PS C:\workspace\TVT26KMO-Linux-LLM> Test-NetConnection 195.148.31.130 -Port 11434
+WARNING: TCP connect to (195.148.31.130 : 11434) failed
+WARNING: Ping to 195.148.31.130 failed with status: TimedOut
+
+
+ComputerName           : 195.148.31.130
+RemoteAddress          : 195.148.31.130
+RemotePort             : 11434
+InterfaceAlias         : WLAN
+SourceAddress          : x.x.x.x
+PingSucceeded          : False
+PingReplyDetails (RTT) : 0 ms
+TcpTestSucceeded       : False
+
+
+
+PS C:\workspace\TVT26KMO-Linux-LLM> Test-NetConnection 195.148.31.130 -Port 8000
+WARNING: TCP connect to (195.148.31.130 : 8000) failed
+WARNING: Ping to 195.148.31.130 failed with status: TimedOut
+
+
+ComputerName           : 195.148.31.130
+RemoteAddress          : 195.148.31.130
+RemotePort             : 8000
+InterfaceAlias         : WLAN
+SourceAddress          : x.x.x.x
+PingSucceeded          : False
+PingReplyDetails (RTT) : 0 ms
+TcpTestSucceeded       : False
+
+
+
+PS C:\workspace\TVT26KMO-Linux-LLM>

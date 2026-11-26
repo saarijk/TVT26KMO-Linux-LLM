@@ -1,23 +1,61 @@
 * { box-sizing: border-box; }
 
+:root {
+  --bg: #f0f4f8;
+  --card: #eef3e5;
+  --text: #203040;
+  --h1: #2d4600;
+  --h1-line: #1b2a00;
+  --h2: #5a8d00;
+  --accent: #5a8d00;
+  --accent-dark: #2d4600;
+  --code-bg: #eef2f6;
+  --code-line: #005a86;
+  --border: #c9d6b8;
+  --user: #2d4600;
+  --assistant: #dfe8d0;
+  --mono: Consolas, "Cascadia Code", "Courier New", monospace;
+}
+
 body {
-  font-family: system-ui, sans-serif;
-  background: #f3f4f6;
-  color: #111827;
-  margin: 0;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
 }
 
 main {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 1rem;
+  background: var(--card);
+  padding: 32px 40px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.subtitle { color: #6b7280; margin-top: -0.5rem; }
+h1 { color: var(--h1); font-size: 1.8em; border-bottom: 2px solid var(--h1-line); padding-bottom: 8px; margin-top: 0; }
+h2 { color: var(--h2); font-size: 1.25em; }
+h3 { font-size: 1.1em; font-style: italic; }
+a { color: var(--code-line); }
+.subtitle { color: #5b6b52; margin-top: -0.5rem; }
 
+code { font-family: var(--mono); font-size: 0.9em; background: var(--code-bg); padding: 0 0.25rem; border-radius: 4px; }
+pre {
+  font-family: var(--mono);
+  background: var(--code-bg);
+  padding: 16px;
+  overflow-x: auto;
+  border-left: 3px solid var(--code-line);
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+pre code { background: none; padding: 0; }
+
+/* Chat */
 #messages {
   background: #fff;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border);
   border-radius: 8px;
   height: 60vh;
   overflow-y: auto;
@@ -34,12 +72,24 @@ main {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-
-.bubble.user { align-self: flex-end; background: #2563eb; color: #fff; }
-.bubble.assistant { align-self: flex-start; background: #e5e7eb; }
+.bubble.user { align-self: flex-end; background: var(--user); color: #fff; }
+.bubble.assistant { align-self: flex-start; background: var(--assistant); }
 .bubble.error { background: #fee2e2; color: #991b1b; }
 
 #chat-form { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
-#message-input { flex: 1; padding: 0.6rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; }
-#send-button { padding: 0.6rem 1.2rem; border: 0; border-radius: 8px; background: #2563eb; color: #fff; font-size: 1rem; cursor: pointer; }
-#send-button:disabled { background: #93c5fd; cursor: wait; }
+#message-input { flex: 1; padding: 0.6rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; font-family: inherit; }
+#send-button { padding: 0.6rem 1.2rem; border: 0; border-radius: 8px; background: var(--accent); color: #fff; font-size: 1rem; cursor: pointer; }
+#send-button:hover { background: var(--accent-dark); }
+#send-button:disabled { background: #a9c47a; cursor: wait; }
+
+/* Documentation page */
+main.docs { max-width: 100%; }
+.docs h2 { margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; }
+.docs table { border-collapse: collapse; width: 100%; background: #fff; }
+.docs th, .docs td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+.docs th { background: var(--card); }
+
+@media (max-width: 600px) {
+  body { margin: 16px auto; }
+  main { padding: 20px 16px; }
+}

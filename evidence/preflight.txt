@@ -1,0 +1,19 @@
+ubuntu@myinstance:~$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           1.9Gi       293Mi       327Mi       4.0Mi       1.3Gi       1.4Gi
+Swap:             0B          0B          0B
+ubuntu@myinstance:~$ df -h /
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1        78G  3.0G   75G   4% /
+ubuntu@myinstance:~$ python3 --version
+Python 3.10.12
+ubuntu@myinstance:~$ sudo ss -ltnp
+State           Recv-Q          Send-Q                   Local Address:Port                   Peer Address:Port         Process
+LISTEN          0               80                             0.0.0.0:3306                        0.0.0.0:*             users:(("mariadbd",pid=192195,fd=24))
+LISTEN          0               511                            0.0.0.0:80                          0.0.0.0:*             users:(("nginx",pid=210502,fd=6),("nginx",pid=210501,fd=6),("nginx",pid=210498,fd=6))
+LISTEN          0               128                            0.0.0.0:22                          0.0.0.0:*             users:(("sshd",pid=647,fd=3))
+LISTEN          0               2048                         127.0.0.1:5000                        0.0.0.0:*             users:(("gunicorn",pid=193094,fd=3),("gunicorn",pid=193093,fd=3),("gunicorn",pid=193090,fd=3))
+LISTEN          0               4096                     127.0.0.53%lo:53                          0.0.0.0:*             users:(("systemd-resolve",pid=545,fd=14))
+LISTEN          0               511                               [::]:80                             [::]:*             users:(("nginx",pid=210502,fd=7),("nginx",pid=210501,fd=7),("nginx",pid=210498,fd=7))
+LISTEN          0               128                               [::]:22                             [::]:*             users:(("sshd",pid=647,fd=4))
+ubuntu@myinstance:~$ 

@@ -155,3 +155,20 @@ def test_history_endpoint(client):
     resp = client.get("/api/history/test-session-4")
     assert resp.status_code == 200
     assert resp.get_json() == [{"role": "user", "content": "Moi"}]
+
+def test_docs_page_renders(client):
+    resp = client.get("/docs")
+    assert resp.status_code == 200
+    assert b"Request path" in resp.data
+
+
+def test_docs_page_uses_forwarded_prefix(client):
+    resp = client.get("/docs", headers={"X-Forwarded-Prefix": "/viikko5"})
+    assert b'href="/viikko5/static/style.css' in resp.data
+
+
+def test_evidence_files_contain_no_secrets():
+    for f in app_module.EVIDENCE_DIR.glob("*.txt"):
+        text = f.read_text(encoding="utf-8")
+        assert "IDENTIFIED BY PASSWORD" not in text, f.name
+        assert "BEGIN OPENSSH" not in text, f.name

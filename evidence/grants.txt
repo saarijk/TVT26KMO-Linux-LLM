@@ -1,0 +1,8 @@
+ubuntu@myinstance:~$ sudo mariadb -e "SHOW GRANTS FOR 'chatapp'@'localhost';"
++----------------------------------------------------------------------------------------------------------------+
+| Grants for chatapp@localhost                                                                                   |
++----------------------------------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `chatapp`@`localhost` (password hash removed) |
+| GRANT SELECT, INSERT ON `chatapp`.* TO `chatapp`@`localhost`                                                   |
++----------------------------------------------------------------------------------------------------------------+
+ubuntu@myinstance:~$

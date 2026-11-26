@@ -1,0 +1,28 @@
+ubuntu@myinstance:~$ systemctl status chatapp --no-pager
+● chatapp.service - LLM-chat (Flask + Gunicorn)
+     Loaded: loaded (/etc/systemd/system/chatapp.service; enabled; vendor preset: enabled)
+     Active: active (running) since Thu 2026-11-26 08:46:11 UTC; 4min 9s ago
+   Main PID: 368787 (gunicorn)
+      Tasks: 6 (limit: 2249)
+     Memory: 55.9M
+        CPU: 883ms
+     CGroup: /system.slice/chatapp.service
+             ├─368787 /opt/chatapp/venv/bin/python3 /opt/chatapp/venv/bin/gunicorn --workers 2 --worker-class gthread --threads 8 --timeo…
+             ├─368794 /opt/chatapp/venv/bin/python3 /opt/chatapp/venv/bin/gunicorn --workers 2 --worker-class gthread --threads 8 --timeo…
+             └─368795 /opt/chatapp/venv/bin/python3 /opt/chatapp/venv/bin/gunicorn --workers 2 --worker-class gthread --threads 8 --timeo…
+
+Nov 26 08:46:11 myinstance gunicorn[368787]: [2026-11-26 08:46:11 +0000] [368787] [INFO] Starting gunicorn 27.0.1
+Nov 26 08:46:11 myinstance gunicorn[368787]: [2026-11-26 08:46:11 +0000] [368787] [INFO] Listening at: unix:/run/chatapp/gunicor… (368787)
+Nov 26 08:46:11 myinstance gunicorn[368787]: [2026-11-26 08:46:11 +0000] [368787] [INFO] Using worker: gthread
+Nov 26 08:46:11 myinstance gunicorn[368794]: [2026-11-26 08:46:11 +0000] [368794] [INFO] Booting worker with pid: 368794
+Nov 26 08:46:12 myinstance gunicorn[368795]: [2026-11-26 08:46:12 +0000] [368795] [INFO] Booting worker with pid: 368795
+Nov 26 08:46:12 myinstance gunicorn[368787]: [2026-11-26 08:46:12 +0000] [368787] [ERROR] Control server error: [Errno 13] Permi…/chatapp'
+Nov 26 08:46:13 myinstance gunicorn[368794]:  - - [26/Nov/2026:08:46:13 +0000] "GET /health HTTP/1.1" 200 41 "-" "curl/7.81.0"
+Nov 26 08:46:14 myinstance gunicorn[368794]: x.x.x.x - - [26/Nov/2026:08:46:14 +0000] "GET /health HTTP/1.1" 200 41 "-" "…l/8.18.0"
+Nov 26 08:46:14 myinstance gunicorn[368794]: x.x.x.x - - [26/Nov/2026:08:46:14 +0000] "GET / HTTP/1.1" 200 729 "-" "curl/8.18.0"
+Nov 26 08:50:06 myinstance gunicorn[368795]: x.x.x.x - - [26/Nov/2026:08:50:06 +0000] "POST /api/chat HTTP/1.1" 200 84 "h…58.0.0.0"
+Hint: Some lines were ellipsized, use -l to show in full.
+ubuntu@myinstance:~$ systemctl show chatapp -p User -p Group
+User=chatapp
+Group=chatapp
+ubuntu@myinstance:~$

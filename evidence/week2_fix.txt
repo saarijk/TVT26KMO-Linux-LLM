@@ -1,0 +1,56 @@
+ubuntu@myinstance:~$ systemctl list-units --all | grep -Ei 'week2|viikko2|gunicorn|flask'
+  chatapp.service                                                                 loaded    active   running   LLM-chat (Flask + Gunicorn)
+● week2.service                                                                   loaded    failed   failed    Week2 flask app with gunicorn
+ubuntu@myinstance:~$ systemctl list-unit-files | grep -Ei 'week2|viikko2|gunicorn|flask'
+week2.service                          enabled         enabled
+ubuntu@myinstance:~$ systemctl status week2 --no-pager
+× week2.service - Week2 flask app with gunicorn
+     Loaded: loaded (/etc/systemd/system/week2.service; enabled; vendor preset: enabled)
+     Active: failed (Result: exit-code) since Thu 2026-11-26 08:56:14 UTC; 9min ago
+    Process: 904 ExecStart=/home/ubuntu/TVT26KMO-Linux/week2/venv/bin/gunicorn --workers 2 --bind 127.0.0.1:5000 app:app (code=exited, status=3)
+   Main PID: 904 (code=exited, status=3)
+        CPU: 528ms
+
+(output trimmed)
+
+Nov 26 08:56:13 myinstance gunicorn[917]: pymysql.err.OperationalError: (2003, "Can't connect to MySQL server on '127.0.0.1' ([Errno 111] Connection refused)")
+Nov 26 08:56:13 myinstance gunicorn[917]: (2003, "Can't connect to MySQL server on '127.0.0.1' ([Errno 111] Connection refused)")
+Nov 26 08:56:13 myinstance gunicorn[917]: [2026-11-26 08:56:13 +0000] [917] [INFO] Worker exiting (pid: 917)
+Nov 26 08:56:13 myinstance gunicorn[904]: [2026-11-26 08:56:13 +0000] [904] [ERROR] Worker (pid:916) exited with code 3.
+Nov 26 08:56:13 myinstance gunicorn[904]: [2026-11-26 08:56:13 +0000] [904] [INFO] Worker (pid:917) was sent SIGTERM!
+Nov 26 08:56:14 myinstance gunicorn[904]: [2026-11-26 08:56:14 +0000] [904] [ERROR] Shutting down: Master
+Nov 26 08:56:14 myinstance gunicorn[904]: [2026-11-26 08:56:14 +0000] [904] [ERROR] Reason: Worker failed to boot.
+
+(output trimmed)
+
+ubuntu@myinstance:~$ systemctl cat week2
+# /etc/systemd/system/week2.service
+[Unit]
+Description=Week2 flask app with gunicorn
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/TVT26KMO-Linux/week2
+Environment="PATH=/home/ubuntu/TVT26KMO-Linux/week2/venv/bin"
+ExecStart=/home/ubuntu/TVT26KMO-Linux/week2/venv/bin/gunicorn --workers 2 --bind 127.0.0.1:5000 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+# /etc/systemd/system/week2.service.d/override.conf
+[Unit]
+After=network.target mariadb.service
+Wants=mariadb.service
+StartLimitIntervalSec=120
+StartLimitBurst=10
+
+[Service]
+RestartSec=5
+ubuntu@myinstance:~$ sudo systemctl daemon-reload
+ubuntu@myinstance:~$ systemctl show week2 -p After -p RestartUSec
+RestartUSec=5s
+After=system.slice basic.target sysinit.target -.mount network.target systemd-journald.socket mariadb.service
+ubuntu@myinstance:~$ 

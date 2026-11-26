@@ -10,6 +10,10 @@
   <main>
     <h1>Local LLM chat</h1>
     <p class="subtitle">Model: {{ model }}, running on this server</p>
+      <p class="subtitle">
+      <a href="{{ url_for('docs') }}">Documentation</a> ·
+      <a href="https://github.com/saarijk/TVT26KMO-Linux-LLM">Repository</a>
+    </p>
 
     <div id="messages" aria-live="polite"></div>
 

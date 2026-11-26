@@ -1,0 +1,3 @@
+ubuntu@myinstance:~$ sudo sshd -T | grep -i passwordauthentication
+passwordauthentication no
+ubuntu@myinstance:~$

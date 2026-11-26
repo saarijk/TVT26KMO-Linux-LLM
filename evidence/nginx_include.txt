@@ -1,0 +1,9 @@
+ubuntu@myinstance:~$ sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+ubuntu@myinstance:~$ sudo nginx -T | grep -n 'snippets/chatapp'
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+235:    include snippets/chatapp.conf;
+299:# configuration file /etc/nginx/snippets/chatapp.conf:
+ubuntu@myinstance:~$

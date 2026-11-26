@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week 5 documentation</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+{% macro show(name) %}<pre>{{ ev.get(name, '(evidence file ' ~ name ~ '.txt is missing)') }}</pre>{% endmacro %}
+<main class="docs">
+  <h1>Week 5: self-hosted LLM chat with CI/CD</h1>
+
+  <h2>1. Links</h2>
+  <ul>
+    <li><a href="{{ url_for('index') }}">Chat page</a></li>
+    <li><a href="https://github.com/saarijk/TVT26KMO-Linux-LLM">GitHub repository</a></li>
+    <li><a href="{{ url_for('health') }}">Health endpoint</a> (returns the running Git commit SHA)</li>
+    <li><a href="https://github.com/saarijk/TVT26KMO-Linux-LLM/actions">Workflow runs</a></li>
+    <li>Failed run #3 (deliberately broken test, deploy skipped): <a href="https://github.com/saarijk/TVT26KMO-Linux-LLM/actions/runs/45785637495">run #3</a></li>
+    <li>Failed run #5 (deliberately broken test, deploy skipped): <a href="https://github.com/saarijk/TVT26KMO-Linux-LLM/actions/runs/45791290445">run #5</a></li>
+  </ul>
+
+  <h2>2. Request path</h2>
+<pre>Browser
+  |  HTTP, port 80
+  v
+Nginx (existing site, /viikko5/ added through an include snippet)
+  |-- /viikko5/static/  -> files served straight from disk (alias)
+  |-- /viikko5/         -> Unix socket /run/chatapp/gunicorn.sock
+                              |
+                              v
+                        Gunicorn + Flask (user chatapp)
+                              |-- HTTP 127.0.0.1:11434 -> Ollama ({{ model }})
+                              |-- 127.0.0.1:3306       -> MariaDB, database chatapp
+
+GitHub Actions --SSH, port 22--> rsync + scripts/deploy.sh</pre>
+  <p>Only Nginx (80) and SSH (22) are reachable from the internet. Ollama listens on
+  127.0.0.1 and the app has no TCP port at all, because Gunicorn uses a Unix socket.
+  The cPouta security group also has no rule for ports 11434 or 8000.</p>
+
+  <h2>3. Pipeline</h2>
+  <ul>
+    <li><b>Every push and pull request:</b> the <code>test</code> job runs
+      <code>ruff check .</code>, <code>pytest</code> (the model and database are mocked)
+      and <code>bash -n scripts/*.sh</code>.</li>
+    <li><b>Push to main:</b> the <code>deploy</code> job has <code>needs: test</code>, so it
+      only starts when the tests are green. It rsyncs the code to
+      <code>/opt/chatapp/app</code> and runs <code>scripts/deploy.sh &lt;sha&gt;</code> over
+      SSH.</li>
+    <li><b>deploy.sh</b> installs dependencies, applies the schema as root, installs the
+      Nginx snippet (restoring the old one if <code>nginx -t</code> fails), installs and
+      restarts only <code>chatapp.service</code>, and waits until the app reports the exact
+      commit SHA.</li>
+    <li><b>Verification:</b> the workflow then calls the public
+      <code>/viikko5/health</code> and fails unless it returns <code>github.sha</code>.
+      It also checks the chat page and <code>static/app.js</code>.</li>
+  </ul>
+    <p>The SHA reaches the server as a command-line argument and is written to a
+  <code>REVISION</code> file by the deploy, never by hand. A commit whose tests fail stops
+  at the <code>test</code> job: the <code>deploy</code> job is skipped and the running
+  version does not change.</p>
+
+  <h2>4. Users, permissions and secrets</h2>
+  <table>
+    <tr><th>What</th><th>Details</th></tr>
+    <tr><td>Linux service user</td><td><code>chatapp</code>: system user, no login shell, no home folder. Runs Gunicorn.</td></tr>
+    <tr><td>Deploy user</td><td><code>ubuntu</code> owns the code in <code>/opt/chatapp/app</code>. The service only reads it.</td></tr>
+    <tr><td>Database user</td><td><code>chatapp@localhost</code> with <code>SELECT, INSERT</code> on database <code>chatapp</code> only. The schema is applied by root during deploy.</td></tr>
+    <tr><td>Env file</td><td><code>/etc/chatapp/chatapp.env</code>, <code>root:chatapp</code>, mode 640. The database password was generated on the server.</td></tr>
+    <tr><td>GitHub secrets</td><td><code>CPOUTA_HOST</code>, <code>CPOUTA_USER</code>, <code>CPOUTA_SSH_KEY</code>, <code>CPOUTA_KNOWN_HOSTS</code>. The workflow reads them only through <code>secrets.*</code>.</td></tr>
+    <tr><td>Deploy key</td><td>A separate ed25519 key pair for GitHub Actions. My personal key is not used and is not in GitHub.</td></tr>
+  </table>
+  <h3>Service user and group</h3>
+  {{ show('service') }}
+  <h3>File ownership and permissions</h3>
+  {{ show('files') }}
+  <h3>Database grants (password hash removed)</h3>
+  {{ show('grants') }}
+
+  <h3>SSH and the security group</h3>
+  <p>GitHub's runners connect from changing IP addresses, so an allowlist would lock them
+  out. I left port 22 open to <code>0.0.0.0/0</code>. Risks: more bot login attempts, and
+  the deploy key logs in as <code>ubuntu</code>, which has sudo, so a leaked key would give
+  full control. Mitigations: password login is disabled (see below), the key is dedicated
+  to deployment and can be revoked by removing one line from
+  <code>authorized_keys</code>, and it is never committed.</p>
+  {{ show('ssh_security') }}
+
+  <h2>5. How /viikko5/ was added to Nginx</h2>
+  <p>The repository contains only <code>location</code> blocks in
+  <code>deploy/nginx/chatapp.conf</code>, which the deploy copies to
+  <code>/etc/nginx/snippets/chatapp.conf</code>. I added one line,
+  <code>include snippets/chatapp.conf;</code>, to the existing site's
+  <code>server</code> block. Nothing else in the site or in other sites was edited. The
+  snippet uses <code>location ^~</code>, so regex locations from other weeks (such as the
+  PHP one) cannot capture <code>/viikko5/static/app.js</code>. The deploy runs
+  <code>nginx -t</code> before reloading and restores the previous snippet on failure.</p>
+  {{ show('nginx_include') }}
+
+  <h2>6. Model, memory and disk</h2>
+  <p>The server has 1.9 GiB RAM and 78 GB disk, so I chose <code>{{ model }}</code>: 397 MB
+  on disk and 486 MB in RAM, running on CPU only. I added a 2 GiB swap file as a safety net
+  (it stayed almost unused). The trade-off is quality: a 0.5B model is fast enough, but
+  its answers are often wrong.</p>
+  {{ show('preflight') }}
+  <h3>Swap</h3>
+  {{ show('swap') }}
+  <h3>Model loaded</h3>
+  {{ show('ollama') }}
+
+  <h2>7. Listening ports</h2>
+  <p>Ollama is on 127.0.0.1:11434, and <code>llama-server</code> (Ollama's internal runner)
+  is on a random localhost port. The app has a Unix socket and no TCP port.
+  <code>0.0.0.0:3306</code> is MariaDB from Week 4, limited by the security group to
+  server B's address. <code>127.0.0.1:5000</code> is the Week 2 app.</p>
+  {{ show('ports') }}
+  <h3>Checked from outside (my Windows PC)</h3>
+  {{ show('outside_in') }}
+
+  <h2>8. Week 4: is the chat database replicated to server B?</h2>
+  <p><b>Yes.</b> Server A's binary log has no <code>Binlog_Do_DB</code> filter and server B
+  has no <code>Replicate_Do_DB</code> filter, so every database on A is copied, including
+  <code>chatapp</code>. It is harmless: B is read-only for users, the replication thread is
+  not blocked by that, and the chat app runs only on A. The chat messages are therefore
+  also stored on B.</p>
+  {{ show('replication') }}
+
+  <h2>9. Test results</h2>
+  <table>
+    <tr><th>Test</th><th>Result</th></tr>
+    <tr><td>/viikko5/ is public and the local model replies</td><td>Passed</td></tr>
+    <tr><td>History survives a reload; a private window starts empty</td><td>Passed (see database rows below)</td></tr>
+    <tr><td>Ollama and the app are not reachable from the internet</td><td>Passed (see section 7)</td></tr>
+    <tr><td>A push to main deploys and /health shows the new SHA</td><td>Passed: runs #2, #4 and #6 each deployed and /health showed the matching commit (see below)</td></tr>
+    <tr><td>A failing test is not deployed</td><td>Passed: runs #3 and #5 failed, deploy was skipped, /health stayed on the previous SHA</td></tr>
+    <tr><td>After a reboot the chat and the model start without manual steps</td><td>Passed</td></tr>
+    <tr><td>Earlier weeks still work</td><td>Passed (Week 2 needed a fix, see section 10)</td></tr>
+  </table>
+  <h3>Deployments and SHAs</h3>
+  {{ show('deployments') }}
+  <h3>Separate sessions in MariaDB</h3>
+  {{ show('messages') }}
+  <h3>Reboot test</h3>
+  {{ show('reboot') }}
+
+  <h2>10. A problem I solved</h2>
+  <p><b>Symptom:</b> after the reboot test, <code>/viikko2/</code> returned 502 Bad
+  Gateway while the new chat worked.<br>
+  <b>Diagnosis:</b> <code>systemctl status week2</code> and
+  <code>journalctl -u week2 -b</code> showed "Can't connect to MySQL server ... Connection
+  refused", followed by "Start request repeated too quickly".<br>
+  <b>Cause:</b> since Week 4 the Week 2 app connects to MariaDB as soon as it starts, but
+  its unit only had <code>After=network.target</code>. At boot it started before MariaDB,
+  crashed five times in under a second, and systemd gave up.<br>
+  <b>Fix:</b> a drop-in override that starts it after MariaDB and retries slowly, leaving
+  the original unit file untouched.<br>
+  <b>Lesson:</b> a reboot test is worth doing for the old services too, and a service that
+  depends on a database needs explicit ordering and a sensible restart delay.</p>
+  {{ show('week2_fix') }}
+</main>
+</body>
+</html>

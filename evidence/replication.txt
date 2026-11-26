@@ -1,0 +1,38 @@
+SERVER A:
+
+ubuntu@myinstance:~$ sudo mariadb -e "SHOW MASTER STATUS;"
++------------------+----------+--------------+------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB |
++------------------+----------+--------------+------------------+
+| mysql-bin.000001 |     7580 |              |                  |
++------------------+----------+--------------+------------------+
+ubuntu@myinstance:~$
+
+SERVER B:
+
+ubuntu@serverb-week4:~$ sudo mariadb -e "SHOW SLAVE STATUS\G" | grep -E 'Replicate_|Running|Seconds_Behind'
+              Slave_IO_Running: Yes
+             Slave_SQL_Running: Yes
+               Replicate_Do_DB:
+           Replicate_Ignore_DB:
+            Replicate_Do_Table:
+        Replicate_Ignore_Table:
+       Replicate_Wild_Do_Table:
+   Replicate_Wild_Ignore_Table:
+         Seconds_Behind_Master: 0
+   Replicate_Ignore_Server_Ids:
+       Replicate_Do_Domain_Ids:
+   Replicate_Ignore_Domain_Ids:
+       Slave_SQL_Running_State: Slave has read all relay log; waiting for more updates
+ubuntu@serverb-week4:~$ sudo mariadb -e "SHOW DATABASES;"
++--------------------+
+| Database           |
++--------------------+
+| chatapp            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
+| visitor_counter    |
++--------------------+
+ubuntu@serverb-week4:~$

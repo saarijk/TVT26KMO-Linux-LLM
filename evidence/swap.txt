@@ -1,0 +1,16 @@
+ubuntu@myinstance:~$ sudo fallocate -l 2G /swapfile
+ubuntu@myinstance:~$ sudo chmod 600 /swapfile
+ubuntu@myinstance:~$ sudo mkswap /swapfile
+Setting up swapspace version 1, size = 2 GiB (2147479552 bytes)
+no label, UUID=...
+ubuntu@myinstance:~$ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+/swapfile none swap sw 0 0
+ubuntu@myinstance:~$ sudo swapon /swapfile
+ubuntu@myinstance:~$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           1.9Gi       295Mi       323Mi       4.0Mi       1.3Gi       1.4Gi
+Swap:          2.0Gi          0B       2.0Gi
+ubuntu@myinstance:~$ swapon --show
+NAME      TYPE SIZE USED PRIO
+/swapfile file   2G   0B   -2
+ubuntu@myinstance:~$ 
